@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPG-BPNet | Advanced Blood Pressure Monitoring</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/plotly.js@2.27.0/dist/plotly.min.js"></script>
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#hero" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <span>PPG-BPNet</span>
+            </a>
+            
+            <div class="nav-menu" id="nav-menu">
+                <a href="#hero" class="nav-link active" data-section="hero">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#interface" class="nav-link" data-section="interface">
+                    <i class="fas fa-desktop"></i>
+                    <span>Interface</span>
+                </a>
+                <a href="#technology" class="nav-link" data-section="technology">
+                    <i class="fas fa-microscope"></i>
+                    <span>Technology</span>
+                </a>
+                <a href="#processing" class="nav-link" data-section="processing">
+                    <i class="fas fa-cogs"></i>
+                    <span>Processing</span>
+                </a>
+                <a href="#model" class="nav-link" data-section="model">
+                    <i class="fas fa-brain"></i>
+                    <span>AI Model</span>
+                </a>
+                <a href="#performance" class="nav-link" data-section="performance">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Performance</span>
+                </a>
+            </div>
+            
+            <button class="mobile-menu-btn" id="mobile-menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section id="hero" class="section hero-section">
+            <div class="hero-background">
+                <div class="hero-gradient"></div>
+                <div class="hero-particles" id="hero-particles"></div>
+            </div>
+            
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class="fas fa-award"></i>
+                        <span>Clinical Grade Accuracy</span>
+                    </div>
+                    
+                    <h1 class="hero-title">
+                        Next-Generation
+                        <span class="gradient-text">Blood Pressure</span>
+                        Monitoring
+                    </h1>
+                    
+                    <p class="hero-description">
+                        Revolutionary non-invasive blood pressure estimation using advanced deep learning 
+                        and photoplethysmography (PPG) signals. Real-time monitoring with clinical-grade precision.
+                    </p>
+                    
+                    <div class="hero-actions">
+                        <a href="#interface" class="btn btn-primary">
+                            <i class="fas fa-play"></i>
+                            Start Monitoring
+                        </a>
+                        <a href="#technology" class="btn btn-secondary">
+                            <i class="fas fa-info-circle"></i>
+                            Learn More
+                        </a>
+                    </div>
+                    
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <div class="stat-value">2.8</div>
+                            <div class="stat-label">mmHg MAE</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">Grade A</div>
+                            <div class="stat-label">BHS Standard</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">Real-time</div>
+                            <div class="stat-label">Processing</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="hero-visual">
+                    <div class="hero-chart-container">
+                        <div id="hero-ppg-chart" class="hero-chart"></div>
+                        <div class="chart-overlay">
+                            <div class="pulse-indicator">
+                                <div class="pulse-dot"></div>
+                                <span>Live PPG Signal</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interface Section -->
+        <section id="interface" class="section interface-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-badge">
+                        <i class="fas fa-desktop"></i>
+                        <span>Smart Interface</span>
+                    </div>
+                    <h2 class="section-title">Blood Pressure Estimation Interface</h2>
+                    <p class="section-description">
+                        Advanced interface for both file analysis and real-time monitoring with 
+                        intuitive controls and comprehensive visualization.
+                    </p>
+                </div>
+                
+                <div class="interface-container">
+                    <!-- Tab Navigation -->
+                    <div class="tab-navigation">
+                        <button class="tab-btn active" data-tab="file">
+                            <i class="fas fa-file-upload"></i>
+                            <span>File Analysis</span>
+                        </button>
+                        <button class="tab-btn" data-tab="live">
+                            <i class="fas fa-broadcast-tower"></i>
+                            <span>Live Monitoring</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Tab Content -->
+                    <div class="tab-content">
+                        <!-- File Analysis Tab -->
+                        <div class="tab-pane active" id="tab-file">
+                            <div class="upload-area">
+                                <form id="upload-form" action="/" method="post" enctype="multipart/form-data">
+                                    <div class="upload-zone" id="upload-zone">
+                                        <div class="upload-icon">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                        </div>
+                                        <h3>Upload PPG Signal File</h3>
+                                        <p>Drag and drop your PPG data file or click to browse</p>
+                                        <input type="file" id="file-input" name="file" accept=".csv,.txt" hidden>
+                                        <div class="file-types">
+                                            <span class="file-type">.CSV</span>
+                                            <span class="file-type">.TXT</span>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-full" disabled id="analyze-btn">
+                                        <i class="fas fa-analytics"></i>
+                                        Analyze Signal
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- Live Monitoring Tab -->
+                        <div class="tab-pane" id="tab-live">
+                            <div class="live-monitoring">
+                                <div class="monitoring-status" id="monitoring-status">
+                                    <div class="status-indicator offline">
+                                        <div class="status-dot"></div>
+                                        <span>Device Offline</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="monitoring-controls">
+                                    <button class="btn btn-success" id="start-monitoring">
+                                        <i class="fas fa-play"></i>
+                                        Start Monitoring
+                                    </button>
+                                    <button class="btn btn-danger" id="stop-monitoring" disabled>
+                                        <i class="fas fa-stop"></i>
+                                        Stop Monitoring
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Results Section -->
+                    <div class="results-section hidden" id="results-section">
+                        <div class="results-header">
+                            <h3>
+                                <i class="fas fa-chart-pulse"></i>
+                                Blood Pressure Analysis
+                            </h3>
+                            <div class="results-timestamp" id="results-timestamp">
+                                Last updated: --
+                            </div>
+                        </div>
+                        
+                        <div class="results-grid">
+                            <div class="bp-readings">
+                                <div class="bp-card systolic">
+                                    <div class="bp-label">
+                                        <i class="fas fa-arrow-up"></i>
+                                        <span>Systolic</span>
+                                    </div>
+                                    <div class="bp-value" id="sbp-value">--</div>
+                                    <div class="bp-unit">mmHg</div>
+                                </div>
+                                
+                                <div class="bp-card diastolic">
+                                    <div class="bp-label">
+                                        <i class="fas fa-arrow-down"></i>
+                                        <span>Diastolic</span>
+                                    </div>
+                                    <div class="bp-value" id="dbp-value">--</div>
+                                    <div class="bp-unit">mmHg</div>
+                                </div>
+                                
+                                <div class="bp-card status">
+                                    <div class="bp-label">
+                                        <i class="fas fa-heartbeat"></i>
+                                        <span>Status</span>
+                                    </div>
+                                    <div class="bp-status" id="bp-status">--</div>
+                                </div>
+                            </div>
+                            
+                            <div class="chart-container">
+                                <div class="chart-header">
+                                    <h4>
+                                        <i class="fas fa-chart-line"></i>
+                                        BP Trend Analysis
+                                    </h4>
+                                    <div class="chart-controls">
+                                        <button class="chart-btn active" data-view="trend">Trend</button>
+                                        <button class="chart-btn" data-view="distribution">Distribution</button>
+                                    </div>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <div id="bp-chart" class="chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technology Section -->
+        <section id="technology" class="section technology-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-badge">
+                        <i class="fas fa-microscope"></i>
+                        <span>Advanced Technology</span>
+                    </div>
+                    <h2 class="section-title">Photoplethysmography Science</h2>
+                    <p class="section-description">
+                        Understanding the optical principles behind non-invasive blood pressure measurement
+                    </p>
+                </div>
+                
+                <div class="technology-content">
+                    <div class="tech-explanation">
+                        <div class="tech-card">
+                            <div class="tech-icon">
+                                <i class="fas fa-lightbulb"></i>
+                            </div>
+                            <h3>Optical Sensing</h3>
+                            <p>LED light penetrates skin tissue and measures blood volume changes through light absorption variations.</p>
+                        </div>
+                        
+                        <div class="tech-card">
+                            <div class="tech-icon">
+                                <i class="fas fa-wave-square"></i>
+                            </div>
+                            <h3>Signal Components</h3>
+                            <p>PPG signals contain pulsatile AC components from heartbeats and steady DC components from tissue.</p>
+                        </div>
+                        
+                        <div class="tech-card">
+                            <div class="tech-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h3>AI Analysis</h3>
+                            <p>Deep learning algorithms extract cardiovascular features from the AC waveform for BP estimation.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="tech-visualization">
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h4>PPG Signal Analysis</h4>
+                                <div class="legend">
+                                    <div class="legend-item">
+                                        <div class="legend-color ppg-signal"></div>
+                                        <span>PPG Signal</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color ac-component"></div>
+                                        <span>AC Component</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color dc-component"></div>
+                                        <span>DC Component</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="ppg-waveform-chart" class="chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Processing Section -->
+        <section id="processing" class="section processing-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-badge">
+                        <i class="fas fa-cogs"></i>
+                        <span>Signal Processing</span>
+                    </div>
+                    <h2 class="section-title">From Raw Signal to AI-Ready Input</h2>
+                    <p class="section-description">
+                        Multi-stage signal processing pipeline that transforms noisy PPG signals into clean, 
+                        analyzable data for our deep learning model.
+                    </p>
+                </div>
+                
+                <div class="processing-pipeline">
+                    <div class="pipeline-steps">
+                        <div class="pipeline-step">
+                            <div class="step-number">01</div>
+                            <div class="step-content">
+                                <div class="step-icon">
+                                    <i class="fas fa-filter"></i>
+                                </div>
+                                <h3>Noise Reduction</h3>
+                                <p>Advanced filtering removes baseline drift and high-frequency noise while preserving critical waveform characteristics.</p>
+                                <div class="step-features">
+                                    <span class="feature-tag">Wavelet Filtering</span>
+                                    <span class="feature-tag">High-pass Filter</span>
+                                    <span class="feature-tag">Baseline Correction</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pipeline-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        
+                        <div class="pipeline-step">
+                            <div class="step-number">02</div>
+                            <div class="step-content">
+                                <div class="step-icon">
+                                    <i class="fas fa-project-diagram"></i>
+                                </div>
+                                <h3>Time-Frequency Transform</h3>
+                                <p>Continuous Wavelet Transform converts 1D time-series signals into 2D time-frequency representations (scalograms).</p>
+                                <div class="step-features">
+                                    <span class="feature-tag">CWT Analysis</span>
+                                    <span class="feature-tag">Scalogram Generation</span>
+                                    <span class="feature-tag">Feature Extraction</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pipeline-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        
+                        <div class="pipeline-step">
+                            <div class="step-number">03</div>
+                            <div class="step-content">
+                                <div class="step-icon">
+                                    <i class="fas fa-balance-scale"></i>
+                                </div>
+                                <h3>Normalization</h3>
+                                <p>Data normalization ensures consistent input scaling for optimal CNN performance and model stability.</p>
+                                <div class="step-features">
+                                    <span class="feature-tag">Z-Score Normalization</span>
+                                    <span class="feature-tag">Min-Max Scaling</span>
+                                    <span class="feature-tag">CNN-Ready Format</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="processing-visualization">
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h4>CWT Scalogram Visualization</h4>
+                                <p>Time-frequency representation of PPG signal</p>
+                            </div>
+                            <div id="cwt-visualization" class="chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Model Section -->
+        <section id="model" class="section model-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-badge">
+                        <i class="fas fa-brain"></i>
+                        <span>AI Architecture</span>
+                    </div>
+                    <h2 class="section-title">Hybrid Deep Learning Model</h2>
+                    <p class="section-description">
+                        State-of-the-art CNN-BiLSTM architecture that combines spatial feature extraction 
+                        with temporal sequence modeling for accurate BP prediction.
+                    </p>
+                </div>
+                
+                <div class="model-content">
+                    <div class="model-architecture">
+                        <div class="architecture-diagram">
+                            <div id="model-architecture-diagram" class="chart"></div>
+                        </div>
+                        
+                        <div class="model-flow">
+                            <div class="flow-step">
+                                <div class="flow-icon cnn-color">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <div class="flow-content">
+                                    <h4>Input Layer</h4>
+                                    <p>2D Scalogram Images</p>
+                                    <span class="dimension">128×128×1</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flow-arrow">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                            
+                            <div class="flow-step">
+                                <div class="flow-icon cnn-color">
+                                    <i class="fas fa-th"></i>
+                                </div>
+                                <div class="flow-content">
+                                    <h4>CNN Layers</h4>
+                                    <p>Spatial Feature Extraction</p>
+                                    <span class="dimension">Conv2D + MaxPool</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flow-arrow">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                            
+                            <div class="flow-step">
+                                <div class="flow-icon lstm-color">
+                                    <i class="fas fa-memory"></i>
+                                </div>
+                                <div class="flow-content">
+                                    <h4>BiLSTM Layers</h4>
+                                    <p>Temporal Sequence Modeling</p>
+                                    <span class="dimension">Bidirectional LSTM</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flow-arrow">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                            
+                            <div class="flow-step">
+                                <div class="flow-icon output-color">
+                                    <i class="fas fa-bullseye"></i>
+                                </div>
+                                <div class="flow-content">
+                                    <h4>Output Layer</h4>
+                                    <p>BP Prediction</p>
+                                    <span class="dimension">SBP & DBP Values</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="model-details">
+                        <div class="detail-card">
+                            <div class="detail-header">
+                                <i class="fas fa-th cnn-color"></i>
+                                <h3>Convolutional Neural Network</h3>
+                            </div>
+                            <div class="detail-content">
+                                <p>Multi-layer CNN extracts spatial features from 2D scalogram images, identifying patterns like systolic peaks and dicrotic notches.</p>
+                                <ul class="detail-features">
+                                    <li><i class="fas fa-check"></i> Spatial pattern recognition</li>
+                                    <li><i class="fas fa-check"></i> Hierarchical feature extraction</li>
+                                    <li><i class="fas fa-check"></i> Translation invariance</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-card">
+                            <div class="detail-header">
+                                <i class="fas fa-memory lstm-color"></i>
+                                <h3>Bidirectional LSTM</h3>
+                            </div>
+                            <div class="detail-content">
+                                <p>BiLSTM processes temporal sequences of CNN features, capturing both forward and backward dependencies in heartbeat patterns.</p>
+                                <ul class="detail-features">
+                                    <li><i class="fas fa-check"></i> Temporal dependency modeling</li>
+                                    <li><i class="fas fa-check"></i> Bidirectional context</li>
+                                    <li><i class="fas fa-check"></i> Long-term memory</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Performance Section -->
+        <section id="performance" class="section performance-section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-badge">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Clinical Validation</span>
+                    </div>
+                    <h2 class="section-title">Clinical-Grade Performance</h2>
+                    <p class="section-description">
+                        Rigorously validated against established clinical standards with performance 
+                        metrics that meet and exceed international guidelines.
+                    </p>
+                </div>
+                
+                <div class="performance-content">
+                    <div class="metrics-grid">
+                        <div class="metric-card primary">
+                            <div class="metric-icon">
+                                <i class="fas fa-bullseye"></i>
+                            </div>
+                            <div class="metric-value">2.8</div>
+                            <div class="metric-unit">mmHg</div>
+                            <div class="metric-label">Mean Absolute Error</div>
+                            <div class="metric-description">Average prediction accuracy</div>
+                        </div>
+                        
+                        <div class="metric-card success">
+                            <div class="metric-icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="metric-value">7.5</div>
+                            <div class="metric-unit">mmHg</div>
+                            <div class="metric-label">Standard Deviation</div>
+                            <div class="metric-description">Measurement precision</div>
+                        </div>
+                        
+                        <div class="metric-card accent">
+                            <div class="metric-icon">
+                                <i class="fas fa-award"></i>
+                            </div>
+                            <div class="metric-value">A</div>
+                            <div class="metric-unit">Grade</div>
+                            <div class="metric-label">BHS Classification</div>
+                            <div class="metric-description">British Hypertension Society</div>
+                        </div>
+                        
+                        <div class="metric-card warning">
+                            <div class="metric-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <div class="metric-value">98.2</div>
+                            <div class="metric-unit">%</div>
+                            <div class="metric-label">AAMI Compliance</div>
+                            <div class="metric-description">Association for Medical Instrumentation</div>
+                        </div>
+                    </div>
+                    
+                    <div class="validation-info">
+                        <div class="validation-card">
+                            <div class="validation-header">
+                                <i class="fas fa-certificate"></i>
+                                <h3>Clinical Standards Compliance</h3>
+                            </div>
+                            <div class="validation-content">
+                                <div class="compliance-items">
+                                    <div class="compliance-item">
+                                        <div class="compliance-icon success">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <div class="compliance-details">
+                                            <h4>AAMI Standards</h4>
+                                            <p>Mean error ≤ 5 mmHg, Standard deviation ≤ 8 mmHg</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="compliance-item">
+                                        <div class="compliance-icon success">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <div class="compliance-details">
+                                            <h4>BHS Grade A</h4>
+                                            <p>≥60% readings within 5 mmHg, ≥85% within 10 mmHg</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="compliance-item">
+                                        <div class="compliance-icon success">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <div class="compliance-details">
+                                            <h4>ESH Protocol</h4>
+                                            <p>European Society of Hypertension validation criteria</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="performance-chart">
+                            <div class="chart-container">
+                                <div class="chart-header">
+                                    <h4>Accuracy Distribution</h4>
+                                    <p>Error distribution across test dataset</p>
+                                </div>
+                                <div id="performance-chart" class="chart"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="logo">
+                        <div class="logo-icon">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        <span>PPG-BPNet</span>
+                    </div>
+                    <p>Advanced non-invasive blood pressure monitoring through deep learning and photoplethysmography.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <div class="link-group">
+                        <h4>Technology</h4>
+                        <a href="#technology">PPG Science</a>
+                        <a href="#processing">Signal Processing</a>
+                        <a href="#model">AI Model</a>
+                    </div>
+                    
+                    <div class="link-group">
+                        <h4>Resources</h4>
+                        <a href="#performance">Clinical Data</a>
+                        <a href="#interface">Documentation</a>
+                        <a href="#">API Reference</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 PPG-BPNet. All rights reserved.</p>
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+flask
+flask-socketio
+gunicorn
+pandas
+pyserial
+simple-websocket
+python-socketio 

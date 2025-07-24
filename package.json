@@ -1,0 +1,13 @@
+{
+  "name": "ppg-bpnet-interface",
+  "version": "1.0.0",
+  "description": "Web interface for PPG-BPNet deep learning model",
+  "scripts": {
+    "build": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.3",
+    "gsap": "^3.12.2",
+    "plotly.js": "^2.27.0"
+  }
+} 
