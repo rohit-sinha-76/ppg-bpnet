@@ -5,3 +5,4 @@ pandas
 pyserial
 simple-websocket
 python-socketio 
+eventlet
