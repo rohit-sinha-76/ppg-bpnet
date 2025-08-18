@@ -121,6 +121,9 @@ body {
   box-shadow: none;
 }
 
+/* Utility */
+.hidden { display: none !important; }
+
 .gradient-text {
   background: var(--gradient-primary);
   -webkit-background-clip: text;
@@ -616,6 +619,13 @@ body {
   font-size: 24px;
   font-weight: 600;
 }
+
+/* BP status color variants */
+.bp-card.status { border: 1px solid var(--border-color); }
+.bp-card.status.status-normal { border-color: rgba(40, 167, 69, 0.5); box-shadow: 0 0 12px rgba(40,167,69,0.1) inset; }
+.bp-card.status.status-elevated { border-color: rgba(255, 193, 7, 0.5); box-shadow: 0 0 12px rgba(255,193,7,0.08) inset; }
+.bp-card.status.status-stage1 { border-color: rgba(255, 126, 0, 0.5); box-shadow: 0 0 12px rgba(255,126,0,0.08) inset; }
+.bp-card.status.status-stage2 { border-color: rgba(220, 53, 69, 0.6); box-shadow: 0 0 12px rgba(220,53,69,0.1) inset; }
 
 .chart-container {
   background-color: var(--surface-dark);

@@ -159,7 +159,8 @@
                         <!-- File Analysis Tab -->
                         <div class="tab-pane active" id="tab-file">
                             <div class="upload-area">
-                                <form id="upload-form" action="/" method="post" enctype="multipart/form-data">
+                                <form id="upload-form" action="/analyze" method="post" enctype="multipart/form-data">
+                                    <input type="hidden" name="use_real" id="use_real" value="true" />
                                     <div class="upload-zone" id="upload-zone">
                                         <div class="upload-icon">
                                             <i class="fas fa-cloud-upload-alt"></i>
@@ -172,10 +173,16 @@
                                             <span class="file-type">.TXT</span>
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary btn-full" disabled id="analyze-btn">
-                                        <i class="fas fa-analytics"></i>
-                                        Analyze Signal
-                                    </button>
+                                    <div class="upload-actions" style="display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-top:12px;">
+                                        <div class="toggle" style="display:flex; align-items:center; gap:8px;">
+                                            <input type="checkbox" id="use-real-toggle" checked onchange="document.getElementById('use_real').value = this.checked ? 'true' : 'false'">
+                                            <label for="use-real-toggle" title="Toggle between mock (default) and real model processing">Use Real Model</label>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary" disabled id="analyze-btn">
+                                            <i class="fas fa-analytics"></i>
+                                            Analyze Signal
+                                        </button>
+                                    </div>
                                 </form>
                             </div>
                         </div>
@@ -242,6 +249,26 @@
                                         <span>Status</span>
                                     </div>
                                     <div class="bp-status" id="bp-status">--</div>
+                                </div>
+                                <div class="bp-card" style="min-width:260px;">
+                                    <div class="bp-label">
+                                        <i class="fas fa-list-check"></i>
+                                        <span>Summary</span>
+                                    </div>
+                                    <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+                                        <div style="display:flex; justify-content:space-between;">
+                                            <span>Category</span>
+                                            <strong id="bp-category">--</strong>
+                                        </div>
+                                        <div style="display:flex; justify-content:space-between;">
+                                            <span>Confidence</span>
+                                            <strong id="bp-confidence">--</strong>
+                                        </div>
+                                        <div style="display:flex; justify-content:space-between;">
+                                            <span>Mode</span>
+                                            <strong id="bp-mode">Real</strong>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             

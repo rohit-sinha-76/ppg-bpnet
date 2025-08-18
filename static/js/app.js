@@ -110,6 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const uploadZone = document.getElementById('upload-zone');
             const fileInput = document.getElementById('file-input');
             const analyzeBtn = document.getElementById('analyze-btn');
+            const uploadForm = document.getElementById('upload-form');
             const uploadText = uploadZone.querySelector('h3');
 
             if (!uploadZone) return;
@@ -142,6 +143,69 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
             });
+
+            // AJAX submit to /analyze to keep user on page and render results
+            if (uploadForm) {
+                uploadForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    if (!fileInput.files || fileInput.files.length === 0) return;
+
+                    try {
+                        analyzeBtn.disabled = true;
+                        const originalText = analyzeBtn.innerHTML;
+                        analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+
+                        const formData = new FormData(uploadForm);
+                        const resp = await fetch(uploadForm.action || '/analyze', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (!resp.ok) throw new Error(`Server error: ${resp.status}`);
+                        const data = await resp.json();
+                        if (!data.success && !('systolic' in data)) throw new Error(data.error || 'Unexpected response');
+
+                        // Show results and populate values
+                        this.resetAndShowResults();
+                        document.getElementById('sbp-value').textContent = data.systolic.toFixed ? data.systolic.toFixed(1) : data.systolic;
+                        document.getElementById('dbp-value').textContent = data.diastolic.toFixed ? data.diastolic.toFixed(1) : data.diastolic;
+                        this.updateBPStatus(Number(data.systolic), Number(data.diastolic));
+
+                        const tsEl = document.getElementById('results-timestamp');
+                        tsEl.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+
+                        // Populate summary fields
+                        const catEl = document.getElementById('bp-category');
+                        const confEl = document.getElementById('bp-confidence');
+                        const modeEl = document.getElementById('bp-mode');
+                        if (catEl) catEl.textContent = data.bp_category || '--';
+                        if (confEl) {
+                            const conf = typeof data.confidence === 'number' ? data.confidence : NaN;
+                            confEl.textContent = isNaN(conf) ? '--' : `${Math.round(conf * 100)}%`;
+                        }
+                        if (modeEl) modeEl.textContent = data.use_real_model ? 'Real' : 'Mock';
+
+                        // Sync toggle with server-used mode
+                        const toggle = document.getElementById('use-real-toggle');
+                        if (toggle && typeof data.use_real_model === 'boolean') {
+                            toggle.checked = data.use_real_model;
+                            const hidden = document.getElementById('use_real');
+                            if (hidden) hidden.value = data.use_real_model ? 'true' : 'false';
+                        }
+
+                        // Update the BP chart with 5-second continuous series
+                        if (data.bp_series && Array.isArray(data.bp_series.t)) {
+                            this.updateBPChartFromSeries(data.bp_series);
+                        }
+                    } catch (err) {
+                        console.error('Analyze failed:', err);
+                        alert(`Analyze failed: ${err.message}`);
+                    } finally {
+                        analyzeBtn.disabled = false;
+                        analyzeBtn.innerHTML = '<i class="fas fa-analytics"></i> Analyze Signal';
+                    }
+                });
+            }
         },
 
         // --- Real-time & Socket.IO ---
@@ -343,6 +407,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 x: [this.bpData.timestamps, this.bpData.timestamps],
                 y: [this.bpData.systolic, this.bpData.diastolic]
             });
+        },
+
+        /**
+         * Replaces the BP chart with provided 5-second series from /analyze.
+         * @param {{t:number[], sbp:number[], dbp:number[]}} series
+         */
+        updateBPChartFromSeries(series) {
+            const tlabels = (series.t || []).map((v) => `${v}s`);
+            const sbp = series.sbp || [];
+            const dbp = series.dbp || [];
+
+            this.bpData = { timestamps: tlabels.slice(), systolic: sbp.slice(), diastolic: dbp.slice() };
+
+            const layout = {
+                xaxis: { title: 'Time (s)', color: 'var(--text-light)' },
+                yaxis: { title: 'BP (mmHg)', range: [50, 180], color: 'var(--text-light)' },
+                margin: { t: 20, l: 60, r: 20, b: 50 },
+                legend: { orientation: 'h', y: 1.1, x: 0.5, xanchor: 'center', font: {color: 'var(--text-light)'} },
+                font: { family: 'Inter, sans-serif' },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)'
+            };
+
+            Plotly.react('bp-chart', [
+                { x: tlabels, y: sbp, type: 'scatter', mode: 'lines+markers', name: 'Systolic', line: { color: 'var(--warning-color)', width: 2 } },
+                { x: tlabels, y: dbp, type: 'scatter', mode: 'lines+markers', name: 'Diastolic', line: { color: 'var(--accent-color)', width: 2 } }
+            ], layout, { responsive: true });
         },
     };
 
